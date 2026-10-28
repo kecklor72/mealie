@@ -1335,6 +1335,19 @@
     "theme-deleted": "Theme deleted",
     "theme-activated": "Theme applied",
     "theme-save-failed": "Unable to save theme",
-    "unsaved-changes": "You have unsaved changes. Discard them?"
+    "unsaved-changes": "You have unsaved changes. Discard them?",
+    "background": "Background",
+    "background-description": "Add your own pictures behind Mealie. The top bar, sidebar and cards become see-through so the picture shows.",
+    "background-image": "Background Image",
+    "background-image-hint": "Shown behind the whole app. Wide images (1920×1080 or larger) work best.",
+    "sidebar-image": "Sidebar Image (optional)",
+    "sidebar-image-hint": "A separate picture for the navigation sidebar. Tall images work best.",
+    "upload-image": "Upload",
+    "replace-image": "Replace",
+    "remove-image": "Remove",
+    "image-upload-failed": "Unable to upload image. Use a JPG, PNG or WebP under 25 MB.",
+    "background-dim": "Darken background",
+    "panel-opacity": "Top bar & sidebar opacity",
+    "card-opacity": "Card opacity"
   }
 }

@@ -12,6 +12,9 @@ FontName = Annotated[str, StringConstraints(pattern=r"^[A-Za-z0-9 \-]{1,64}$", s
 
 ThemeId = Annotated[str, StringConstraints(pattern=r"^[A-Za-z0-9\-_]{1,64}$")]
 
+ThemeImageId = Annotated[str, StringConstraints(pattern=r"^[a-f0-9]{32}$")]
+"""ID of an image uploaded with `POST /api/users/self/themes/images`"""
+
 MAX_THEMES = 50
 MAX_CUSTOM_CSS_LENGTH = 50_000
 
@@ -37,6 +40,22 @@ class UserTheme(MealieModel):
     font_heading: FontName | None = None
     custom_css: Annotated[str, StringConstraints(max_length=MAX_CUSTOM_CSS_LENGTH)] = ""
 
+    background_image: ThemeImageId | None = None
+    """Full screen background image, shown behind the whole app"""
+    sidebar_image: ThemeImageId | None = None
+    """Optional separate image for the navigation sidebar"""
+    background_dim: Annotated[float, Field(ge=0, le=0.95)] = 0.3
+    """How much to darken the background image (0 = not at all)"""
+    panel_opacity: Annotated[float, Field(ge=0, le=1)] = 0.75
+    """Opacity of the top bar and sidebar when a background image is set"""
+    card_opacity: Annotated[float, Field(ge=0, le=1)] = 0.9
+    """Opacity of cards when a background image is set"""
+
+
+class UserThemeImage(MealieModel):
+    id: ThemeImageId
+    url: str
+
 
 class UserThemeSettings(MealieModel):
     active_theme_id: ThemeId | None = None
@@ -53,3 +72,11 @@ class UserThemeSettings(MealieModel):
             self.active_theme_id = None
 
         return self
+
+    def referenced_images(self) -> set[str]:
+        images: set[str] = set()
+        for theme in self.themes:
+            for image in (theme.background_image, theme.sidebar_image):
+                if image:
+                    images.add(image)
+        return images

@@ -303,6 +303,11 @@ export interface UserTheme {
   fontBody?: string | null;
   fontHeading?: string | null;
   customCss?: string;
+  backgroundImage?: string | null;
+  sidebarImage?: string | null;
+  backgroundDim?: number;
+  panelOpacity?: number;
+  cardOpacity?: number;
 }
 export interface UserThemeColors {
   primary?: string;
@@ -314,6 +319,10 @@ export interface UserThemeColors {
   error?: string;
   background?: string | null;
   surface?: string | null;
+}
+export interface UserThemeImage {
+  id: string;
+  url: string;
 }
 export interface UserThemeSettings {
   activeThemeId?: string | null;

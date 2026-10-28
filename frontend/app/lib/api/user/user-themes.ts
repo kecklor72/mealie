@@ -1,11 +1,18 @@
 import { BaseAPI } from "../base/base-clients";
-import type { UserThemeSettings } from "~/lib/api/types/user";
+import type { UserThemeImage, UserThemeSettings } from "~/lib/api/types/user";
 
 const prefix = "/api";
 
 const routes = {
   themesSelf: `${prefix}/users/self/themes`,
+  themesSelfImages: `${prefix}/users/self/themes/images`,
+  themesSelfImagesId: (id: string) => `${prefix}/users/self/themes/images/${id}`,
 };
+
+/** URL of an uploaded theme image. Requests are authenticated with the session cookie. */
+export function themeImageUrl(imageId: string) {
+  return routes.themesSelfImagesId(imageId);
+}
 
 export class UserThemesAPI extends BaseAPI {
   async getSettings() {
@@ -18,5 +25,15 @@ export class UserThemesAPI extends BaseAPI {
 
   async resetSettings() {
     return await this.requests.delete<UserThemeSettings>(routes.themesSelf);
+  }
+
+  async uploadImage(file: File) {
+    const form = new FormData();
+    form.append("image", file);
+    return await this.requests.post<UserThemeImage>(routes.themesSelfImages, form);
+  }
+
+  async deleteImage(imageId: string) {
+    return await this.requests.delete(routes.themesSelfImagesId(imageId));
   }
 }

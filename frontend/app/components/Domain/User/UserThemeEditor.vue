@@ -108,6 +108,87 @@
     </v-row>
 
     <h3 class="text-h6 mt-4 mb-1">
+      {{ $t('user-themes.background') }}
+    </h3>
+    <p class="text-body-2 mb-3">
+      {{ $t('user-themes.background-description') }}
+    </p>
+    <v-row dense>
+      <v-col
+        cols="12"
+        sm="6"
+      >
+        <UserThemeImageField
+          v-model="theme.backgroundImage"
+          :label="$t('user-themes.background-image')"
+          :hint="$t('user-themes.background-image-hint')"
+        />
+      </v-col>
+      <v-col
+        cols="12"
+        sm="6"
+      >
+        <UserThemeImageField
+          v-model="theme.sidebarImage"
+          :label="$t('user-themes.sidebar-image')"
+          :hint="$t('user-themes.sidebar-image-hint')"
+          tall
+        />
+      </v-col>
+    </v-row>
+    <div
+      v-if="theme.backgroundImage || theme.sidebarImage"
+      class="mt-4"
+    >
+      <v-slider
+        v-if="theme.backgroundImage"
+        v-model="theme.backgroundDim"
+        :label="$t('user-themes.background-dim')"
+        :min="0"
+        :max="0.9"
+        :step="0.05"
+        color="primary"
+        thumb-label
+        hide-details
+        class="mb-2"
+      >
+        <template #thumb-label="{ modelValue: v }">
+          {{ Math.round(v * 100) }}%
+        </template>
+      </v-slider>
+      <v-slider
+        v-model="theme.panelOpacity"
+        :label="$t('user-themes.panel-opacity')"
+        :min="0"
+        :max="1"
+        :step="0.05"
+        color="primary"
+        thumb-label
+        hide-details
+        class="mb-2"
+      >
+        <template #thumb-label="{ modelValue: v }">
+          {{ Math.round(v * 100) }}%
+        </template>
+      </v-slider>
+      <v-slider
+        v-if="theme.backgroundImage"
+        v-model="theme.cardOpacity"
+        :label="$t('user-themes.card-opacity')"
+        :min="0"
+        :max="1"
+        :step="0.05"
+        color="primary"
+        thumb-label
+        hide-details
+      >
+        <template #thumb-label="{ modelValue: v }">
+          {{ Math.round(v * 100) }}%
+        </template>
+      </v-slider>
+    </div>
+
+    <h3 class="text-h6 mt-4 mb-1">
       {{ $t('user-themes.custom-css') }}
     </h3>
     <p class="text-body-2 mb-3">
@@ -151,6 +232,12 @@ const fontItems = [...Object.keys(SYSTEM_FONTS), ...SUGGESTED_FONTS];
 // make sure both color sets exist so v-model bindings are reactive
 if (!theme.value.light) theme.value.light = {};
 if (!theme.value.dark) theme.value.dark = {};
+// fill in background defaults for themes saved before backgrounds existed
+theme.value.backgroundImage ??= null;
+theme.value.sidebarImage ??= null;
+theme.value.backgroundDim ??= 0.3;
+theme.value.panelOpacity ??= 0.75;
+theme.value.cardOpacity ??= 0.9;
 
 const currentColors = computed<UserThemeColors>(() => theme.value[mode.value] as UserThemeColors);
 

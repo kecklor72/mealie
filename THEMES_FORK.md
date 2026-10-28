@@ -7,13 +7,15 @@ This fork adds a per-user **Theme Manager** to Mealie, at **Profile → Themes**
 - Live preview while editing: the whole app updates as you change things
 - Body and heading fonts (system fonts or any Google Font)
 - A custom CSS box for anything else
+- Background images: one for the whole app plus an optional one for the sidebar, with sliders for dimming and see-through panels and cards
 - 6 presets to start from, plus duplicate / import / export (copy theme JSON)
 - Each user has their own themes, and "Mealie Default" uses the server's `THEME_*` settings
 
 ## How it's built (and why it's easy to keep updated)
 
 - **No database changes.** Themes are saved as JSON files in the data volume at `/app/data/user-themes/<user-id>.json`. They are included in Mealie backups. You can switch back to the official image at any time without breaking anything, and the themes stay put if you come back.
-- API: `GET / PUT / DELETE /api/users/self/themes` (only for the logged-in user)
+- API: `GET / PUT / DELETE /api/users/self/themes`, plus `POST /api/users/self/themes/images` and `GET / DELETE /api/users/self/themes/images/{id}` (only for the logged-in user)
+- Background images are converted to WebP and stored in `/app/data/user-themes/images/<user-id>/`. Images that no theme uses are cleaned up automatically after a day.
 - Almost all of the code is in new files, so merging new Mealie releases rarely conflicts.
 
 | Area | Files |

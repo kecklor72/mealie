@@ -221,6 +221,8 @@ users_self_ratings = "/api/users/self/ratings"
 """`/api/users/self/ratings`"""
 users_self_themes = "/api/users/self/themes"
 """`/api/users/self/themes`"""
+users_self_themes_images = "/api/users/self/themes/images"
+"""`/api/users/self/themes/images`"""
 utils_download = "/api/utils/download"
 """`/api/utils/download`"""
 
@@ -628,3 +630,8 @@ def users_item_id(item_id):
 def users_self_ratings_recipe_id(recipe_id):
     """`/api/users/self/ratings/{recipe_id}`"""
     return f"{prefix}/users/self/ratings/{recipe_id}"
+
+
+def users_self_themes_images_image_id(image_id):
+    """`/api/users/self/themes/images/{image_id}`"""
+    return f"{prefix}/users/self/themes/images/{image_id}"

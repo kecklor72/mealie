@@ -176,6 +176,12 @@
             class="theme-card"
             :class="{ 'theme-card--active': theme.id === activeThemeId }"
           >
+            <img
+              v-if="theme.backgroundImage"
+              :src="themeImageUrl(theme.backgroundImage)"
+              :alt="theme.name"
+              class="theme-card__image"
+            >
             <div class="swatch-strip">
               <span
                 v-for="(c, i) in swatchColors(theme.light, 'light')"
@@ -308,6 +314,7 @@ import {
   type ThemeMode,
 } from "~/composables/use-user-themes";
 import { alert } from "~/composables/use-toast";
+import { themeImageUrl } from "~/lib/api/user/user-themes";
 
 definePageMeta({
   middleware: ["auth"],
@@ -344,9 +351,24 @@ function clone<T>(v: T): T {
   return JSON.parse(JSON.stringify(v));
 }
 
+function normalizeTheme(theme: UserTheme): UserTheme {
+  const t = clone(theme);
+  t.light ??= {};
+  t.dark ??= {};
+  t.fontBody ??= null;
+  t.fontHeading ??= null;
+  t.customCss ??= "";
+  t.backgroundImage ??= null;
+  t.sidebarImage ??= null;
+  t.backgroundDim ??= 0.3;
+  t.panelOpacity ??= 0.75;
+  t.cardOpacity ??= 0.9;
+  return t;
+}
+
 function openEditor(theme: UserTheme) {
-  draft.value = clone(theme);
-  original.value = JSON.stringify(theme);
+  draft.value = normalizeTheme(theme);
+  original.value = JSON.stringify(draft.value);
   editing.value = true;
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
@@ -479,7 +501,8 @@ async function deleteConfirmed() {
 }
 
 async function copyJson(theme: UserTheme) {
-  const { id: _id, ...exportable } = theme;
+  // image IDs only work for this account, so they aren't included
+  const { id: _id, backgroundImage: _bg, sidebarImage: _side, ...exportable } = theme;
   try {
     await navigator.clipboard.writeText(JSON.stringify(exportable, null, 2));
     alert.success(i18n.t("general.copied-to-clipboard"));
@@ -508,6 +531,9 @@ function importTheme() {
       fontBody: typeof parsed.fontBody === "string" ? parsed.fontBody : null,
       fontHeading: typeof parsed.fontHeading === "string" ? parsed.fontHeading : null,
       customCss: typeof parsed.customCss === "string" ? parsed.customCss : "",
+      backgroundDim: typeof parsed.backgroundDim === "number" ? parsed.backgroundDim : 0.3,
+      panelOpacity: typeof parsed.panelOpacity === "number" ? parsed.panelOpacity : 0.75,
+      cardOpacity: typeof parsed.cardOpacity === "number" ? parsed.cardOpacity : 0.9,
     };
     importText.value = "";
     // Open in the editor so the user can review it (and validation runs) before saving
@@ -527,6 +553,12 @@ function importTheme() {
 }
 .theme-card--active {
   border: 2px solid rgb(var(--v-theme-success));
+}
+.theme-card__image {
+  display: block;
+  width: 100%;
+  height: 110px;
+  object-fit: cover;
 }
 .swatch-strip {
   display: flex;

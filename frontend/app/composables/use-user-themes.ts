@@ -2,6 +2,7 @@ import type { ThemeInstance } from "vuetify";
 import type { Composer } from "vue-i18n";
 import type { UserTheme, UserThemeColors, UserThemeSettings } from "~/lib/api/types/user";
 import { useUserApi } from "~/composables/api";
+import { themeImageUrl } from "~/lib/api/user/user-themes";
 
 /**
  * Per-user theme manager.
@@ -125,6 +126,11 @@ export function createDefaultTheme(name: string): UserTheme {
     fontBody: null,
     fontHeading: null,
     customCss: "",
+    backgroundImage: null,
+    sidebarImage: null,
+    backgroundDim: 0.3,
+    panelOpacity: 0.75,
+    cardOpacity: 0.9,
   };
 }
 
@@ -208,6 +214,65 @@ function buildFontCss(theme: UserTheme | null): string {
   return css;
 }
 
+const IMAGE_ID_PATTERN = /^[a-f0-9]{32}$/;
+
+function clamp(value: number | undefined, min: number, max: number, fallback: number) {
+  if (typeof value !== "number" || Number.isNaN(value)) {
+    return fallback;
+  }
+  return Math.min(max, Math.max(min, value));
+}
+
+function buildBackgroundCss(theme: UserTheme | null): string {
+  const bg = theme?.backgroundImage && IMAGE_ID_PATTERN.test(theme.backgroundImage) ? theme.backgroundImage : null;
+  const side = theme?.sidebarImage && IMAGE_ID_PATTERN.test(theme.sidebarImage) ? theme.sidebarImage : null;
+  if (!bg && !side) {
+    return "";
+  }
+
+  const dim = clamp(theme?.backgroundDim, 0, 0.95, 0.3);
+  const panel = clamp(theme?.panelOpacity, 0, 1, 0.75);
+  const card = clamp(theme?.cardOpacity, 0, 1, 0.9);
+  const panelBg = `rgba(var(--v-theme-surface), ${panel})`;
+  let css = "";
+
+  if (bg) {
+    css += `
+.v-application {
+  background-color: rgb(var(--v-theme-background)) !important;
+  background-image: linear-gradient(rgba(0, 0, 0, ${dim}), rgba(0, 0, 0, ${dim})), url("${themeImageUrl(bg)}") !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  background-attachment: fixed !important;
+}
+.v-application .v-main { background: transparent !important; }
+.v-application .v-main .v-card { background-color: rgba(var(--v-theme-surface), ${card}) !important; }`;
+  }
+
+  css += `
+.v-application .v-app-bar.v-toolbar {
+  background-color: ${panelBg} !important;
+  backdrop-filter: blur(6px);
+}
+.v-application .v-navigation-drawer {
+  background-color: ${panelBg} !important;
+  backdrop-filter: blur(6px);
+}`;
+
+  if (side) {
+    css += `
+.v-application .v-navigation-drawer {
+  background-image: linear-gradient(${panelBg}, ${panelBg}), url("${themeImageUrl(side)}") !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+}`;
+  }
+
+  return css;
+}
+
 function applyStyles(theme: UserTheme | null) {
   if (typeof document === "undefined") {
     return;
@@ -219,7 +284,7 @@ function applyStyles(theme: UserTheme | null) {
     }
   }
 
-  const css = `${buildFontCss(theme)}\n${theme?.customCss ?? ""}`.trim();
+  const css = `${buildBackgroundCss(theme)}\n${buildFontCss(theme)}\n${theme?.customCss ?? ""}`.trim();
   let el = document.getElementById(STYLE_ELEMENT_ID) as HTMLStyleElement | null;
 
   if (!css) {
