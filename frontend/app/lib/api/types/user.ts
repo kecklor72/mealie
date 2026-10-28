@@ -295,6 +295,30 @@ export interface UserRatingUpdate {
   rating?: number | null;
   isFavorite?: boolean | null;
 }
+export interface UserTheme {
+  id: string;
+  name: string;
+  light?: UserThemeColors;
+  dark?: UserThemeColors;
+  fontBody?: string | null;
+  fontHeading?: string | null;
+  customCss?: string;
+}
+export interface UserThemeColors {
+  primary?: string;
+  accent?: string;
+  secondary?: string;
+  success?: string;
+  info?: string;
+  warning?: string;
+  error?: string;
+  background?: string | null;
+  surface?: string | null;
+}
+export interface UserThemeSettings {
+  activeThemeId?: string | null;
+  themes?: UserTheme[];
+}
 export interface ValidateResetToken {
   token: string;
 }

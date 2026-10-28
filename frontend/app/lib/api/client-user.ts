@@ -1,5 +1,6 @@
 import { RecipeAPI } from "./user/recipes";
 import { UserApi } from "./user/users";
+import { UserThemesAPI } from "./user/user-themes";
 import { HouseholdAPI } from "./user/households";
 import { GroupAPI } from "./user/groups";
 import { BackupAPI } from "./user/backups";
@@ -30,6 +31,7 @@ import type { ApiRequestInstance } from "~/lib/api/types/non-generated";
 export class UserApiClient {
   public recipes: RecipeAPI;
   public users: UserApi;
+  public userThemes: UserThemesAPI;
   public households: HouseholdAPI;
   public groups: GroupAPI;
   public backups: BackupAPI;
@@ -67,6 +69,7 @@ export class UserApiClient {
 
     // Users
     this.users = new UserApi(requests);
+    this.userThemes = new UserThemesAPI(requests);
     this.households = new HouseholdAPI(requests);
     this.groups = new GroupAPI(requests);
     this.cookbooks = new CookbookAPI(requests);

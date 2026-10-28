@@ -99,6 +99,21 @@
             {{ $t('profile.user-settings-description') }}
           </UserProfileLinkCard>
         </v-col>
+        <v-col
+          cols="12"
+          sm="12"
+          md="6"
+        >
+          <UserProfileLinkCard
+            :link="{ text: $t('user-themes.manage-themes'), to: `/user/profile/themes` }"
+            image="/svgs/manage-themes.svg"
+          >
+            <template #title>
+              {{ $t('user-themes.themes') }}
+            </template>
+            {{ $t('user-themes.profile-description') }}
+          </UserProfileLinkCard>
+        </v-col>
         <AdvancedOnly>
           <v-col
             cols="12"

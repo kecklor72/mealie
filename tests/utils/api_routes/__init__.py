@@ -219,6 +219,8 @@ users_self_favorites = "/api/users/self/favorites"
 """`/api/users/self/favorites`"""
 users_self_ratings = "/api/users/self/ratings"
 """`/api/users/self/ratings`"""
+users_self_themes = "/api/users/self/themes"
+"""`/api/users/self/themes`"""
 utils_download = "/api/utils/download"
 """`/api/utils/download`"""
 
