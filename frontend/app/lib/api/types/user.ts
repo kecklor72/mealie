@@ -110,6 +110,53 @@ export interface GroupSummary {
   preferences?: ReadGroupPreferences | null;
   aiProviderSettings?: AIProviderSettingsOut | null;
 }
+export interface LibraryImportResult {
+  imported: LibraryTheme[];
+}
+export interface LibraryTheme {
+  slug: string;
+  builtin: boolean;
+  enabled?: boolean;
+  description?: string;
+  schedule?: ThemeSchedule | null;
+  theme: UserTheme;
+}
+export interface ThemeSchedule {
+  start: string;
+  end: string;
+}
+export interface UserTheme {
+  id: string;
+  name: string;
+  light?: UserThemeColors;
+  dark?: UserThemeColors;
+  fontBody?: string | null;
+  fontHeading?: string | null;
+  customCss?: string;
+  backgroundImage?: string | null;
+  sidebarImage?: string | null;
+  backgroundDim?: number;
+  panelOpacity?: number;
+  cardOpacity?: number;
+  backgroundImageUrl?: string | null;
+  sidebarImageUrl?: string | null;
+}
+export interface UserThemeColors {
+  primary?: string;
+  accent?: string;
+  secondary?: string;
+  success?: string;
+  info?: string;
+  warning?: string;
+  error?: string;
+  background?: string | null;
+  surface?: string | null;
+}
+export interface LibraryThemeUpdate {
+  enabled?: boolean | null;
+  schedule?: ThemeSchedule | null;
+  clearSchedule?: boolean;
+}
 export interface LongLiveTokenCreateResponse {
   name: string;
   id: number;
@@ -189,6 +236,23 @@ export interface ResetPassword {
 export interface SavePasswordResetToken {
   userId: string;
   token: string;
+}
+export interface ThemePackManifest {
+  id?: string | null;
+  name: string;
+  description?: string;
+  light?: UserThemeColors;
+  dark?: UserThemeColors;
+  fontBody?: string | null;
+  fontHeading?: string | null;
+  customCss?: string;
+  css?: string | null;
+  backgroundImage?: string | null;
+  sidebarImage?: string | null;
+  backgroundDim?: number;
+  panelOpacity?: number;
+  cardOpacity?: number;
+  schedule?: ThemeSchedule | null;
 }
 export interface Token {
   access_token: string;
@@ -295,37 +359,13 @@ export interface UserRatingUpdate {
   rating?: number | null;
   isFavorite?: boolean | null;
 }
-export interface UserTheme {
-  id: string;
-  name: string;
-  light?: UserThemeColors;
-  dark?: UserThemeColors;
-  fontBody?: string | null;
-  fontHeading?: string | null;
-  customCss?: string;
-  backgroundImage?: string | null;
-  sidebarImage?: string | null;
-  backgroundDim?: number;
-  panelOpacity?: number;
-  cardOpacity?: number;
-}
-export interface UserThemeColors {
-  primary?: string;
-  accent?: string;
-  secondary?: string;
-  success?: string;
-  info?: string;
-  warning?: string;
-  error?: string;
-  background?: string | null;
-  surface?: string | null;
-}
 export interface UserThemeImage {
   id: string;
   url: string;
 }
 export interface UserThemeSettings {
   activeThemeId?: string | null;
+  autoSeasonal?: boolean;
   themes?: UserTheme[];
 }
 export interface ValidateResetToken {

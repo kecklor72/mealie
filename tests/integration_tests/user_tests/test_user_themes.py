@@ -26,7 +26,7 @@ def _theme(theme_id: str = "ocean", **overrides) -> dict:
 def test_get_theme_settings_default(api_client: TestClient, unique_user: TestUser):
     response = api_client.get(api_routes.users_self_themes, headers=unique_user.token)
     assert response.status_code == 200
-    assert response.json() == {"activeThemeId": None, "themes": []}
+    assert response.json() == {"activeThemeId": None, "autoSeasonal": True, "themes": []}
 
 
 def test_requires_auth(api_client: TestClient):
@@ -71,7 +71,7 @@ def test_reset_theme_settings(api_client: TestClient, unique_user: TestUser):
     assert response.status_code == 200
 
     response = api_client.get(api_routes.users_self_themes, headers=unique_user.token)
-    assert response.json() == {"activeThemeId": None, "themes": []}
+    assert response.json() == {"activeThemeId": None, "autoSeasonal": True, "themes": []}
 
 
 def test_unknown_active_theme_falls_back_to_default(api_client: TestClient, unique_user: TestUser):
@@ -89,7 +89,7 @@ def test_invalid_values_rejected(api_client: TestClient, unique_user: TestUser):
         {"themes": [_theme(id="../../etc")]},
         {"themes": [_theme(name="")]},
         {"themes": [_theme(), _theme()]},  # duplicate ids
-        {"themes": [_theme(customCss="a" * 50_001)]},
+        {"themes": [_theme(customCss="a" * 100_001)]},
         {"themes": [_theme(theme_id=f"t{i}") for i in range(51)]},
     ]
 

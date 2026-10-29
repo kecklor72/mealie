@@ -1,6 +1,6 @@
 import type { ThemeInstance } from "vuetify";
 import type { Composer } from "vue-i18n";
-import type { UserTheme, UserThemeColors, UserThemeSettings } from "~/lib/api/types/user";
+import type { LibraryTheme, ThemeSchedule, UserTheme, UserThemeColors, UserThemeSettings } from "~/lib/api/types/user";
 import { useUserApi } from "~/composables/api";
 import { themeImageUrl } from "~/lib/api/user/user-themes";
 
@@ -215,6 +215,18 @@ function buildFontCss(theme: UserTheme | null): string {
 }
 
 const IMAGE_ID_PATTERN = /^[a-f0-9]{32}$/;
+const LIBRARY_IMAGE_URL_PATTERN = /^\/api\/themes\/library\/[a-z0-9][a-z0-9-]{0,47}\/files\/[a-z0-9][a-z0-9_-]{0,63}\.webp$/;
+
+/** Resolves a theme image: an uploaded image (by id) wins over an image from the theme library (by url) */
+export function resolveThemeImage(id: string | null | undefined, url: string | null | undefined): string | null {
+  if (id && IMAGE_ID_PATTERN.test(id)) {
+    return themeImageUrl(id);
+  }
+  if (url && LIBRARY_IMAGE_URL_PATTERN.test(url)) {
+    return url;
+  }
+  return null;
+}
 
 function clamp(value: number | undefined, min: number, max: number, fallback: number) {
   if (typeof value !== "number" || Number.isNaN(value)) {
@@ -224,8 +236,8 @@ function clamp(value: number | undefined, min: number, max: number, fallback: nu
 }
 
 function buildBackgroundCss(theme: UserTheme | null): string {
-  const bg = theme?.backgroundImage && IMAGE_ID_PATTERN.test(theme.backgroundImage) ? theme.backgroundImage : null;
-  const side = theme?.sidebarImage && IMAGE_ID_PATTERN.test(theme.sidebarImage) ? theme.sidebarImage : null;
+  const bg = resolveThemeImage(theme?.backgroundImage, theme?.backgroundImageUrl);
+  const side = resolveThemeImage(theme?.sidebarImage, theme?.sidebarImageUrl);
   if (!bg && !side) {
     return "";
   }
@@ -240,7 +252,7 @@ function buildBackgroundCss(theme: UserTheme | null): string {
     css += `
 .v-application {
   background-color: rgb(var(--v-theme-background)) !important;
-  background-image: linear-gradient(rgba(0, 0, 0, ${dim}), rgba(0, 0, 0, ${dim})), url("${themeImageUrl(bg)}") !important;
+  background-image: linear-gradient(rgba(0, 0, 0, ${dim}), rgba(0, 0, 0, ${dim})), url("${bg}") !important;
   background-size: cover !important;
   background-position: center !important;
   background-repeat: no-repeat !important;
@@ -263,7 +275,7 @@ function buildBackgroundCss(theme: UserTheme | null): string {
   if (side) {
     css += `
 .v-application .v-navigation-drawer {
-  background-image: linear-gradient(${panelBg}, ${panelBg}), url("${themeImageUrl(side)}") !important;
+  background-image: linear-gradient(${panelBg}, ${panelBg}), url("${side}") !important;
   background-size: cover !important;
   background-position: center !important;
   background-repeat: no-repeat !important;
@@ -335,22 +347,59 @@ export function applyCachedUserTheme(userId: string) {
   }
 }
 
-export function getActiveTheme(settings: UserThemeSettings | null): UserTheme | null {
-  if (!settings?.activeThemeId) {
+export const LIBRARY_PREFIX = "lib:";
+
+function monthDay(date: Date) {
+  return `${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+}
+
+/** True when `date` falls inside a yearly schedule. Schedules may wrap around the new year (e.g. 12-20 to 01-05). */
+export function isInSchedule(schedule: ThemeSchedule | null | undefined, date = new Date()) {
+  if (!schedule?.start || !schedule?.end) {
+    return false;
+  }
+  const today = monthDay(date);
+  if (schedule.start <= schedule.end) {
+    return today >= schedule.start && today <= schedule.end;
+  }
+  return today >= schedule.start || today <= schedule.end;
+}
+
+/** The library theme that's scheduled for today, if any */
+export function getSeasonalTheme(library: LibraryTheme[], date = new Date()): LibraryTheme | null {
+  return library.find(t => t.enabled !== false && isInSchedule(t.schedule, date)) ?? null;
+}
+
+/** Resolves an active theme id (a user's own theme, or `lib:<slug>`) to a theme */
+export function findTheme(id: string | null | undefined, themes: UserTheme[], library: LibraryTheme[]): UserTheme | null {
+  if (!id) {
     return null;
   }
-  return settings.themes?.find(t => t.id === settings.activeThemeId) ?? null;
+  if (id.startsWith(LIBRARY_PREFIX)) {
+    return library.find(t => t.theme.id === id)?.theme ?? null;
+  }
+  return themes.find(t => t.id === id) ?? null;
 }
 
 export function useUserThemes(i18n?: Composer) {
   const api = useUserApi(i18n);
   const auth = useMealieAuth();
   const settings = useState<UserThemeSettings | null>("user-theme-settings", () => null);
+  const library = useState<LibraryTheme[]>("user-theme-library", () => []);
   const loading = useState<boolean>("user-theme-settings-loading", () => false);
 
   const themes = computed(() => settings.value?.themes ?? []);
   const activeThemeId = computed(() => settings.value?.activeThemeId ?? null);
-  const activeTheme = computed(() => getActiveTheme(settings.value));
+  const autoSeasonal = computed(() => settings.value?.autoSeasonal !== false);
+
+  /** The theme the user picked */
+  const chosenTheme = computed(() => findTheme(activeThemeId.value, themes.value, library.value));
+
+  /** The holiday/seasonal theme in effect today, if the user has automatic themes turned on */
+  const seasonalTheme = computed(() => (autoSeasonal.value ? getSeasonalTheme(library.value) : null));
+
+  /** The theme that's actually applied */
+  const activeTheme = computed(() => seasonalTheme.value?.theme ?? chosenTheme.value);
 
   function applyActive() {
     applyUserTheme(activeTheme.value);
@@ -362,13 +411,26 @@ export function useUserThemes(i18n?: Composer) {
 
   async function refresh() {
     loading.value = true;
-    const { data } = await api.userThemes.getSettings();
+    const [settingsRes, libraryRes] = await Promise.all([api.userThemes.getSettings(), api.userThemes.getLibrary()]);
     loading.value = false;
-    if (data) {
-      settings.value = data;
+    if (libraryRes.data) {
+      library.value = libraryRes.data;
+    }
+    if (settingsRes.data) {
+      settings.value = settingsRes.data;
+    }
+    if (settingsRes.data || libraryRes.data) {
       applyActive();
     }
-    return data;
+    return settingsRes.data;
+  }
+
+  function currentSettings(): UserThemeSettings {
+    return {
+      activeThemeId: activeThemeId.value,
+      autoSeasonal: autoSeasonal.value,
+      themes: themes.value,
+    };
   }
 
   async function save(newSettings: UserThemeSettings) {
@@ -381,7 +443,11 @@ export function useUserThemes(i18n?: Composer) {
   }
 
   async function setActive(themeId: string | null) {
-    return await save({ activeThemeId: themeId, themes: themes.value });
+    return await save({ ...currentSettings(), activeThemeId: themeId });
+  }
+
+  async function setAutoSeasonal(value: boolean) {
+    return await save({ ...currentSettings(), autoSeasonal: value });
   }
 
   async function upsertTheme(theme: UserTheme, makeActive = false) {
@@ -393,24 +459,29 @@ export function useUserThemes(i18n?: Composer) {
     else {
       list.push(theme);
     }
-    return await save({ activeThemeId: makeActive ? theme.id : activeThemeId.value, themes: list });
+    return await save({ ...currentSettings(), activeThemeId: makeActive ? theme.id : activeThemeId.value, themes: list });
   }
 
   async function deleteTheme(themeId: string) {
     const list = themes.value.filter(t => t.id !== themeId);
     const active = activeThemeId.value === themeId ? null : activeThemeId.value;
-    return await save({ activeThemeId: active, themes: list });
+    return await save({ ...currentSettings(), activeThemeId: active, themes: list });
   }
 
   return {
     settings,
+    library,
     loading,
     themes,
     activeThemeId,
+    autoSeasonal,
+    chosenTheme,
+    seasonalTheme,
     activeTheme,
     refresh,
     save,
     setActive,
+    setAutoSeasonal,
     upsertTheme,
     deleteTheme,
     applyActive,

@@ -1,0 +1,40 @@
+{
+  "id": "fourth-of-july",
+  "name": "4th of July",
+  "description": "Red, white and blue with twinkling stars.",
+  "light": {
+    "primary": "#B22234",
+    "accent": "#1D4ED8",
+    "secondary": "#3C3B6E",
+    "success": "#2E7D32",
+    "info": "#1D4ED8",
+    "warning": "#F59E0B",
+    "error": "#B91C1C",
+    "background": "#F8FAFC",
+    "surface": "#FFFFFF"
+  },
+  "dark": {
+    "primary": "#EF4444",
+    "accent": "#60A5FA",
+    "secondary": "#818CF8",
+    "success": "#4ADE80",
+    "info": "#60A5FA",
+    "warning": "#FBBF24",
+    "error": "#F87171",
+    "background": "#0B1026",
+    "surface": "#131A3A"
+  },
+  "fontBody": "Source Sans 3",
+  "fontHeading": "Oswald",
+  "customCss": ".v-app-bar .v-toolbar-title__placeholder::after { content: \" 🎆\"; }\n.v-app-bar { border-bottom: 4px solid; border-image: linear-gradient(90deg, #B22234 33%, #FFFFFF 33% 66%, #3C3B6E 66%) 1; }\n\n/* ✨ Twinkling stars (4th of July, or any dark theme) */\n.v-application::after {\n  content: \"\";\n  position: fixed;\n  inset: 0;\n  pointer-events: none;\n  z-index: 3000;\n  background-repeat: repeat !important; /* Vuetify's reset turns repeat off */\n  --star: rgba(60, 59, 110, 0.45);\n  background-image:\n    radial-gradient(3px 3px at 40px 60px, var(--star) 50%, transparent 51%),\n    radial-gradient(4px 4px at 180px 120px, rgba(178, 34, 52, 0.5) 50%, transparent 51%),\n    radial-gradient(3px 3px at 300px 40px, var(--star) 50%, transparent 51%),\n    radial-gradient(5px 5px at 90px 250px, var(--star) 50%, transparent 51%),\n    radial-gradient(3px 3px at 260px 300px, rgba(178, 34, 52, 0.5) 50%, transparent 51%);\n  background-size: 340px 340px;\n  animation: mealie-twinkle 3.5s ease-in-out infinite alternate;\n}\n.v-application.v-theme--dark::after { --star: rgba(255, 255, 255, 0.85); }\n@keyframes mealie-twinkle {\n  from { opacity: 0.25; }\n  to { opacity: 1; }\n}\n@media (prefers-reduced-motion: reduce) {\n  .v-application::after { animation: none; }\n}",
+  "css": null,
+  "backgroundImage": null,
+  "sidebarImage": null,
+  "backgroundDim": 0.3,
+  "panelOpacity": 0.75,
+  "cardOpacity": 0.9,
+  "schedule": {
+    "start": "06-28",
+    "end": "07-05"
+  }
+}

@@ -2,6 +2,7 @@ import json
 import os
 import tempfile
 import time
+from io import BytesIO
 from pathlib import Path
 from typing import BinaryIO
 from uuid import uuid4
@@ -26,6 +27,25 @@ ORPHAN_IMAGE_GRACE_SECONDS = 24 * 60 * 60
 
 class ThemeImageError(Exception):
     pass
+
+
+def convert_image_to_webp(data: bytes, dest: Path, max_dimension: int = MAX_IMAGE_DIMENSION) -> None:
+    """Validates image bytes and saves them as a (possibly downscaled) WebP file.
+
+    Raises `ThemeImageError` if the data isn't a supported image.
+    """
+    try:
+        with Image.open(BytesIO(data)) as img:
+            if img.width * img.height > MAX_IMAGE_PIXELS:
+                raise ThemeImageError("Image has too many pixels")
+            img = ImageOps.exif_transpose(img)
+            if img.mode not in ("RGB", "RGBA"):
+                img = img.convert("RGBA" if "A" in img.getbands() else "RGB")
+            img.thumbnail((max_dimension, max_dimension))
+            img.save(dest, "WEBP", quality=85, method=4)
+    except (UnidentifiedImageError, OSError, Image.DecompressionBombError) as e:
+        dest.unlink(missing_ok=True)
+        raise ThemeImageError("That file is not a supported image") from e
 
 
 class UserThemeService:
@@ -110,24 +130,8 @@ class UserThemeService:
         if len(data) > MAX_IMAGE_UPLOAD_BYTES:
             raise ThemeImageError("Image is too large (max 25 MB)")
 
-        with tempfile.NamedTemporaryFile(dir=image_dir, prefix=".upload-", delete=True) as tmp:
-            tmp.write(data)
-            tmp.flush()
-            try:
-                with Image.open(tmp.name) as img:
-                    if img.width * img.height > MAX_IMAGE_PIXELS:
-                        raise ThemeImageError("Image has too many pixels")
-                    img = ImageOps.exif_transpose(img)
-                    if img.mode not in ("RGB", "RGBA"):
-                        img = img.convert("RGBA" if "A" in img.getbands() else "RGB")
-                    img.thumbnail((MAX_IMAGE_DIMENSION, MAX_IMAGE_DIMENSION))
-
-                    image_id = uuid4().hex
-                    dest = image_dir / f"{image_id}.webp"
-                    img.save(dest, "WEBP", quality=85, method=4)
-            except (UnidentifiedImageError, OSError, Image.DecompressionBombError) as e:
-                raise ThemeImageError("That file is not a supported image") from e
-
+        image_id = uuid4().hex
+        convert_image_to_webp(data, image_dir / f"{image_id}.webp")
         return image_id
 
     def delete_image(self, user_id: UUID4, image_id: str) -> None:

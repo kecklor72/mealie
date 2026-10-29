@@ -120,6 +120,7 @@
       >
         <UserThemeImageField
           v-model="theme.backgroundImage"
+          v-model:library-url="theme.backgroundImageUrl"
           :label="$t('user-themes.background-image')"
           :hint="$t('user-themes.background-image-hint')"
         />
@@ -130,6 +131,7 @@
       >
         <UserThemeImageField
           v-model="theme.sidebarImage"
+          v-model:library-url="theme.sidebarImageUrl"
           :label="$t('user-themes.sidebar-image')"
           :hint="$t('user-themes.sidebar-image-hint')"
           tall
@@ -137,11 +139,11 @@
       </v-col>
     </v-row>
     <div
-      v-if="theme.backgroundImage || theme.sidebarImage"
+      v-if="hasBackground || hasSidebar"
       class="mt-4"
     >
       <v-slider
-        v-if="theme.backgroundImage"
+        v-if="hasBackground"
         v-model="theme.backgroundDim"
         :label="$t('user-themes.background-dim')"
         :min="0"
@@ -172,7 +174,7 @@
         </template>
       </v-slider>
       <v-slider
-        v-if="theme.backgroundImage"
+        v-if="hasBackground"
         v-model="theme.cardOpacity"
         :label="$t('user-themes.card-opacity')"
         :min="0"
@@ -202,8 +204,8 @@
       auto-grow
       spellcheck="false"
       placeholder=".v-card { border-radius: 16px; }"
-      :counter="50000"
-      :rules="[(v: string) => (v ?? '').length <= 50000 || $t('user-themes.theme-save-failed')]"
+      :counter="100000"
+      :rules="[(v: string) => (v ?? '').length <= 100000 || $t('user-themes.theme-save-failed')]"
     />
   </v-form>
 </template>
@@ -235,9 +237,14 @@ if (!theme.value.dark) theme.value.dark = {};
 // fill in background defaults for themes saved before backgrounds existed
 theme.value.backgroundImage ??= null;
 theme.value.sidebarImage ??= null;
+theme.value.backgroundImageUrl ??= null;
+theme.value.sidebarImageUrl ??= null;
 theme.value.backgroundDim ??= 0.3;
 theme.value.panelOpacity ??= 0.75;
 theme.value.cardOpacity ??= 0.9;
+
+const hasBackground = computed(() => !!(theme.value.backgroundImage || theme.value.backgroundImageUrl));
+const hasSidebar = computed(() => !!(theme.value.sidebarImage || theme.value.sidebarImageUrl));
 
 const currentColors = computed<UserThemeColors>(() => theme.value[mode.value] as UserThemeColors);
 

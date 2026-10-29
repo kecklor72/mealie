@@ -1,0 +1,40 @@
+{
+  "id": "haunted-halloween",
+  "name": "Haunted Halloween",
+  "description": "A haunted night: moonlit castle, glowing pumpkins, bats and fog.",
+  "light": {
+    "primary": "#FF7A1A",
+    "accent": "#A3E635",
+    "secondary": "#7C3AED",
+    "success": "#2F9E44",
+    "info": "#9775FA",
+    "warning": "#FFB020",
+    "error": "#FF5A5F",
+    "background": "#0F0814",
+    "surface": "#1A0F22"
+  },
+  "dark": {
+    "primary": "#FF7A1A",
+    "accent": "#A3E635",
+    "secondary": "#7C3AED",
+    "success": "#2F9E44",
+    "info": "#9775FA",
+    "warning": "#FFB020",
+    "error": "#FF5A5F",
+    "background": "#0F0814",
+    "surface": "#1A0F22"
+  },
+  "fontBody": "Roboto Condensed",
+  "fontHeading": "Creepster",
+  "customCss": "/* ===== Haunted Halloween ===== */\n\n/* Logo: spooky glowing title with a pumpkin */\n.v-app-bar .v-toolbar-title__placeholder {\n  font-family: \"Creepster\", cursive !important;\n  font-size: 2.1rem;\n  letter-spacing: 2px;\n  text-transform: uppercase;\n  color: #ff7a1a;\n  text-shadow: 0 0 10px rgba(255, 122, 26, 0.75), 0 2px 0 #3b0f05;\n  overflow: visible;\n}\n.v-app-bar .v-toolbar-title__placeholder::after { content: \" 🎃\"; font-size: 1.6rem; text-shadow: none; }\n.v-app-bar { border-bottom: 1px solid rgba(255, 122, 26, 0.35); }\n\n/* Top bar search: dark with an orange outline */\n.v-app-bar .v-field.bg-primary-darken-1 {\n  background: rgba(20, 10, 28, 0.8) !important;\n  border: 1px solid #ff7a1a;\n  box-shadow: 0 0 12px rgba(255, 122, 26, 0.45);\n  color: #ffb066 !important;\n}\n\n/* Page headings glow orange (\"Recipes\", page titles) */\n.v-main .text-headline-small {\n  font-family: \"Creepster\", cursive !important;\n  font-size: 2.2rem !important;\n  letter-spacing: 2px;\n  text-transform: uppercase;\n}\n.v-main h1, .v-main h2, .v-main .text-h3, .v-main .text-h4, .v-main .text-h5, .v-main .text-headline-small {\n  color: #ff8a2a;\n  text-shadow: 0 0 12px rgba(255, 122, 26, 0.55);\n  letter-spacing: 1px;\n}\n\n/* Cards: glowing orange edges, cobweb in the corner, graveyard along the bottom */\n.v-main .v-card {\n  border: 1px solid rgba(255, 122, 26, 0.55) !important;\n  border-radius: 10px !important;\n  box-shadow: 0 0 14px rgba(255, 122, 26, 0.22), inset 0 0 30px rgba(124, 58, 237, 0.12) !important;\n  background-image:\n    url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 60'%3E%3Cg fill='%23000' fill-opacity='.55'%3E%3Cpath d='M0 60V48c40-8 80 2 120-4s90-10 180 2v14z'/%3E%3Cpath d='M190 52V30a12 12 0 0 1 24 0v22z'/%3E%3Cpath d='M228 52V22h6v-8h6v8h6v30z'/%3E%3Cpath d='M262 52V34a9 9 0 0 1 18 0v18z'/%3E%3Cpath d='M150 24c-3-3-7-4-11-2-2-3-6-4-9-2 2 2 2 5 1 7 3-1 6 0 8 2 2-2 5-2 7-1l2-2 2 2c2-1 5-1 7 1 2-2 5-3 8-2-1-2-1-5 1-7-3-2-7-1-9 2-4-2-8-1-11 2z'/%3E%3C/g%3E%3C/svg%3E\") !important;\n  background-repeat: no-repeat !important;\n  background-position: right bottom !important;\n  background-size: 260px auto !important;\n}\n.v-main .v-card::after {\n  content: \"\";\n  position: absolute;\n  top: 0;\n  right: 0;\n  width: 70px;\n  height: 70px;\n  pointer-events: none;\n  z-index: 2;\n  opacity: 0.55;\n  background: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg fill='none' stroke='%23e9e1f5' stroke-width='1'%3E%3Cpath d='M100 0L0 0M100 0L10 40M100 0L40 80M100 0L80 100M100 0L100 100'/%3E%3Cpath d='M80 0Q84 10 92 8Q90 18 100 20'/%3E%3Cpath d='M60 0Q66 18 79 16Q76 34 100 40'/%3E%3Cpath d='M40 0Q48 28 64 26Q60 52 100 60'/%3E%3Cpath d='M20 0Q30 36 48 34Q44 68 100 80'/%3E%3C/g%3E%3C/svg%3E\") no-repeat top right / contain;\n}\n\n/* Recipe titles: bold, condensed, uppercase (instead of the creepy heading font) */\n.v-main .v-card .v-card-title,\n.v-main .v-card .v-card-title * {\n  font-family: \"Roboto Condensed\", sans-serif !important;\n  font-weight: 700 !important;\n  text-transform: uppercase;\n  letter-spacing: 0.5px;\n  color: #fff3e6;\n}\n\n/* Filter buttons (Categories, Tags, Tools, Foods...): dark with orange glow */\n.v-main .v-btn.bg-accent,\n.v-main .v-btn.bg-secondary {\n  background: rgba(20, 10, 28, 0.85) !important;\n  color: #ffb066 !important;\n  border: 1px solid #ff7a1a;\n  box-shadow: 0 0 10px rgba(255, 122, 26, 0.35);\n}\n\n/* Search box glow */\n.v-main .v-field--variant-outlined { box-shadow: 0 0 14px rgba(255, 122, 26, 0.25); border-radius: 8px; }\n.v-main .v-field--variant-outlined .v-field__outline { color: #ff7a1a; --v-field-border-opacity: 0.9; }\n\n/* Tags on recipe cards: slime green */\n.v-main .v-card .v-chip {\n  background: #2f9e44 !important;\n  color: #fff !important;\n}\n\n/* Sidebar: glowing active item and Create button */\n.v-navigation-drawer .v-list-item--active {\n  background: linear-gradient(90deg, rgba(255, 122, 26, 0.9), rgba(255, 122, 26, 0.25)) !important;\n  color: #fff !important;\n  box-shadow: 0 0 12px rgba(255, 122, 26, 0.45);\n}\n.v-navigation-drawer .v-list-item--active .v-list-item__overlay { opacity: 0 !important; }\n.v-navigation-drawer .v-btn.bg-primary,\n.v-navigation-drawer .v-btn--variant-elevated {\n  box-shadow: 0 0 16px rgba(255, 122, 26, 0.65) !important;\n}\n\n/* Bats flapping across the sky */\n.v-application::before {\n  content: \"🦇          🦇                                🦇\";\n  position: fixed;\n  top: 12vh;\n  left: -40vw;\n  white-space: pre;\n  font-size: 26px;\n  pointer-events: none;\n  z-index: 3000;\n  opacity: 0.85;\n  filter: brightness(0.6);\n  animation: haunted-bats 22s linear infinite;\n}\n@keyframes haunted-bats {\n  0%   { transform: translate(0, 0); }\n  25%  { transform: translate(40vw, -4vh); }\n  50%  { transform: translate(80vw, 3vh); }\n  75%  { transform: translate(120vw, -5vh); }\n  100% { transform: translate(150vw, 0); }\n}\n\n/* Drifting fog along the bottom */\n.v-application::after {\n  content: \"\";\n  position: fixed;\n  left: -50vw;\n  right: -50vw;\n  bottom: -40px;\n  height: 180px;\n  pointer-events: none;\n  z-index: 2999;\n  background:\n    radial-gradient(ellipse 25% 60% at 20% 70%, rgba(200, 185, 225, 0.22), transparent 70%),\n    radial-gradient(ellipse 30% 50% at 55% 80%, rgba(200, 185, 225, 0.18), transparent 70%),\n    radial-gradient(ellipse 22% 55% at 85% 75%, rgba(200, 185, 225, 0.2), transparent 70%);\n  filter: blur(6px);\n  animation: haunted-fog 40s ease-in-out infinite alternate;\n}\n@keyframes haunted-fog {\n  from { transform: translateX(-12vw); }\n  to { transform: translateX(12vw); }\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .v-application::before, .v-application::after { animation: none; }\n  .v-application::before { display: none; }\n}\n\n\n/* Keep the background scene sharp behind the sidebar and top bar */\n.v-application .v-navigation-drawer, .v-application .v-app-bar.v-toolbar { backdrop-filter: none !important; }",
+  "css": null,
+  "backgroundImage": "background.webp",
+  "sidebarImage": null,
+  "backgroundDim": 0.1,
+  "panelOpacity": 0.45,
+  "cardOpacity": 0.85,
+  "schedule": {
+    "start": "10-01",
+    "end": "10-31"
+  }
+}

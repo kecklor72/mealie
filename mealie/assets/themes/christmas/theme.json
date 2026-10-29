@@ -1,0 +1,40 @@
+{
+  "id": "christmas",
+  "name": "Christmas",
+  "description": "Red, evergreen and gold with gently falling snow.",
+  "light": {
+    "primary": "#B71C1C",
+    "accent": "#C9A227",
+    "secondary": "#1B5E20",
+    "success": "#2E7D32",
+    "info": "#1565C0",
+    "warning": "#EF6C00",
+    "error": "#D32F2F",
+    "background": "#FBFAF7",
+    "surface": "#FFFFFF"
+  },
+  "dark": {
+    "primary": "#EF5350",
+    "accent": "#FFD54F",
+    "secondary": "#66BB6A",
+    "success": "#81C784",
+    "info": "#64B5F6",
+    "warning": "#FFB74D",
+    "error": "#FF8A80",
+    "background": "#0E1A12",
+    "surface": "#15261B"
+  },
+  "fontBody": "Lato",
+  "fontHeading": "Mountains of Christmas",
+  "customCss": ".v-app-bar .v-toolbar-title__placeholder::after { content: \" 🎄\"; }\n.v-app-bar { border-bottom: 4px solid; border-image: repeating-linear-gradient(90deg, #B71C1C 0 16px, #FFFFFF 16px 32px) 1; }\n\n/* ❄ Falling snow (great for Christmas) */\n.v-application::after {\n  content: \"\";\n  position: fixed;\n  inset: 0;\n  pointer-events: none;\n  z-index: 3000;\n  background-repeat: repeat !important; /* Vuetify's reset turns repeat off */\n  --flake: rgba(110, 150, 195, 0.6);\n  background-image:\n    radial-gradient(3px 3px at 20px 30px, var(--flake) 50%, transparent 51%),\n    radial-gradient(4px 4px at 120px 90px, var(--flake) 50%, transparent 51%),\n    radial-gradient(3px 3px at 70px 150px, var(--flake) 50%, transparent 51%),\n    radial-gradient(5px 5px at 160px 180px, var(--flake) 50%, transparent 51%),\n    radial-gradient(6px 6px at 40px 60px, var(--flake) 50%, transparent 51%),\n    radial-gradient(7px 7px at 220px 240px, var(--flake) 50%, transparent 51%),\n    radial-gradient(5px 5px at 290px 120px, var(--flake) 50%, transparent 51%),\n    radial-gradient(8px 8px at 140px 310px, var(--flake) 50%, transparent 51%);\n  background-size:\n    200px 200px, 200px 200px, 200px 200px, 200px 200px,\n    340px 340px, 340px 340px, 340px 340px, 340px 340px;\n  animation: mealie-snow 16s linear infinite;\n}\n.v-application.v-theme--dark::after { --flake: rgba(255, 255, 255, 0.8); }\n@keyframes mealie-snow {\n  from {\n    background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0;\n  }\n  to {\n    background-position:\n      40px 400px, 40px 400px, 40px 400px, 40px 400px,\n      -60px 340px, -60px 340px, -60px 340px, -60px 340px;\n  }\n}\n@media (prefers-reduced-motion: reduce) {\n  .v-application::after { animation: none; }\n}",
+  "css": null,
+  "backgroundImage": null,
+  "sidebarImage": null,
+  "backgroundDim": 0.3,
+  "panelOpacity": 0.75,
+  "cardOpacity": 0.9,
+  "schedule": {
+    "start": "12-01",
+    "end": "12-26"
+  }
+}

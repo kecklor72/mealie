@@ -8,8 +8,8 @@
       :class="{ 'theme-image-field__preview--tall': tall }"
     >
       <img
-        v-if="modelValue"
-        :src="themeImageUrl(modelValue)"
+        v-if="previewUrl"
+        :src="previewUrl"
         :alt="label"
       >
       <div
@@ -45,14 +45,14 @@
         :prepend-icon="$globals.icons.upload"
         @click="fileInput?.click()"
       >
-        {{ modelValue ? $t('user-themes.replace-image') : $t('user-themes.upload-image') }}
+        {{ previewUrl ? $t('user-themes.replace-image') : $t('user-themes.upload-image') }}
       </v-btn>
       <v-spacer />
       <v-btn
-        v-if="modelValue"
+        v-if="previewUrl"
         variant="text"
         :prepend-icon="$globals.icons.delete"
-        @click="modelValue = null"
+        @click="clear"
       >
         {{ $t('user-themes.remove-image') }}
       </v-btn>
@@ -63,7 +63,7 @@
 <script setup lang="ts">
 import { useUserApi } from "~/composables/api";
 import { alert } from "~/composables/use-toast";
-import { themeImageUrl } from "~/lib/api/user/user-themes";
+import { resolveThemeImage } from "~/composables/use-user-themes";
 
 defineProps({
   label: { type: String, required: true },
@@ -71,7 +71,17 @@ defineProps({
   tall: { type: Boolean, default: false },
 });
 
+/** ID of an image the user uploaded */
 const modelValue = defineModel<string | null | undefined>({ default: null });
+/** Image from the theme library (used when no image was uploaded) */
+const libraryUrl = defineModel<string | null | undefined>("libraryUrl", { default: null });
+
+const previewUrl = computed(() => resolveThemeImage(modelValue.value, libraryUrl.value));
+
+function clear() {
+  modelValue.value = null;
+  libraryUrl.value = null;
+}
 
 const i18n = useI18n();
 const api = useUserApi();
@@ -92,6 +102,7 @@ async function onFile(event: Event) {
 
   if (data?.id) {
     modelValue.value = data.id;
+    libraryUrl.value = null;
   }
   else {
     alert.error(i18n.t("user-themes.image-upload-failed"));

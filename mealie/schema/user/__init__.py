@@ -44,7 +44,17 @@ from .user_passwords import (
     SavePasswordResetToken,
     ValidateResetToken,
 )
-from .user_theme import UserTheme, UserThemeColors, UserThemeImage, UserThemeSettings
+from .user_theme import (
+    LibraryImportResult,
+    LibraryTheme,
+    LibraryThemeUpdate,
+    ThemePackManifest,
+    ThemeSchedule,
+    UserTheme,
+    UserThemeColors,
+    UserThemeImage,
+    UserThemeSettings,
+)
 
 __all__ = [
     "CreateUserRegistration",
@@ -90,4 +100,9 @@ __all__ = [
     "UserThemeColors",
     "UserThemeImage",
     "UserThemeSettings",
+    "LibraryImportResult",
+    "LibraryTheme",
+    "LibraryThemeUpdate",
+    "ThemePackManifest",
+    "ThemeSchedule",
 ]

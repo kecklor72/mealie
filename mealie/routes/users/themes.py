@@ -7,7 +7,8 @@ from fastapi.responses import FileResponse
 from mealie.routes._base import BaseUserController, controller
 from mealie.routes._base.routers import UserAPIRouter
 from mealie.schema.response.responses import ErrorResponse
-from mealie.schema.user.user_theme import UserThemeImage, UserThemeSettings
+from mealie.schema.user.user_theme import LibraryTheme, UserThemeImage, UserThemeSettings
+from mealie.services.user_services.theme_library_service import ThemeLibraryService
 from mealie.services.user_services.user_theme_service import ThemeImageError, UserThemeService
 
 router = UserAPIRouter(prefix="/users/self/themes", tags=["Users: Themes"])
@@ -63,3 +64,32 @@ class UserThemesController(BaseUserController):
     def delete_theme_image(self, image_id: ImageIdPath):
         """Delete one of the logged in user's theme images"""
         self.service.delete_image(self.user.id, image_id)
+
+
+# ======================================================================
+# Shared theme library (read-only for users; admins manage it under /api/admin/themes/library)
+
+library_router = UserAPIRouter(prefix="/themes/library", tags=["Themes: Library"])
+
+LibrarySlugPath = Annotated[str, Path(pattern=r"^[a-z0-9][a-z0-9-]{0,47}$")]
+LibraryFilePath = Annotated[str, Path(pattern=r"^[a-z0-9][a-z0-9_-]{0,63}\.webp$")]
+
+
+@controller(library_router)
+class ThemeLibraryController(BaseUserController):
+    @cached_property
+    def service(self) -> ThemeLibraryService:
+        return ThemeLibraryService()
+
+    @library_router.get("", response_model=list[LibraryTheme])
+    def get_library_themes(self):
+        """Themes everyone can use: built-in themes and themes uploaded by an admin"""
+        return self.service.list_themes()
+
+    @library_router.get("/{slug}/files/{name}", response_class=FileResponse)
+    def get_library_file(self, slug: LibrarySlugPath, name: LibraryFilePath):
+        """Get an image that belongs to a library theme"""
+        path = self.service.file_path(slug, name)
+        if not path:
+            raise HTTPException(status.HTTP_404_NOT_FOUND)
+        return FileResponse(path, media_type="image/webp", headers={"Cache-Control": "private, max-age=86400"})

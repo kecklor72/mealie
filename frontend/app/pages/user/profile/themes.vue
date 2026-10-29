@@ -119,38 +119,13 @@
           cols="12"
           sm="6"
         >
-          <v-card
-            variant="outlined"
-            class="theme-card"
-            :class="{ 'theme-card--active': !activeThemeId }"
+          <UserThemeCard
+            :name="$t('user-themes.default-theme')"
+            :subtitle="$t('user-themes.default-theme-description')"
+            :active="!activeTheme"
+            :selected="!activeThemeId"
           >
-            <div class="swatch-strip">
-              <span
-                v-for="c in swatchColors(defaultColors.light)"
-                :key="`dl-${c}`"
-                :style="{ backgroundColor: c }"
-              />
-            </div>
-            <div class="swatch-strip swatch-strip--dark">
-              <span
-                v-for="c in swatchColors(defaultColors.dark)"
-                :key="`dd-${c}`"
-                :style="{ backgroundColor: c }"
-              />
-            </div>
-            <v-card-title class="d-flex align-center">
-              {{ $t('user-themes.default-theme') }}
-              <v-chip
-                v-if="!activeThemeId"
-                color="success"
-                size="small"
-                class="ml-2"
-              >
-                {{ $t('user-themes.active') }}
-              </v-chip>
-            </v-card-title>
-            <v-card-subtitle>{{ $t('user-themes.default-theme-description') }}</v-card-subtitle>
-            <v-card-actions>
+            <template #actions>
               <v-spacer />
               <v-btn
                 v-if="activeThemeId"
@@ -160,8 +135,8 @@
               >
                 {{ $t('user-themes.use-theme') }}
               </v-btn>
-            </v-card-actions>
-          </v-card>
+            </template>
+          </UserThemeCard>
         </v-col>
 
         <!-- User themes -->
@@ -171,46 +146,16 @@
           cols="12"
           sm="6"
         >
-          <v-card
-            variant="outlined"
-            class="theme-card"
-            :class="{ 'theme-card--active': theme.id === activeThemeId }"
+          <UserThemeCard
+            :name="theme.name"
+            :subtitle="fontSummary(theme)"
+            :image="resolveThemeImage(theme.backgroundImage, theme.backgroundImageUrl)"
+            :light="theme.light"
+            :dark="theme.dark"
+            :active="theme.id === activeTheme?.id"
+            :selected="theme.id === activeThemeId"
           >
-            <img
-              v-if="theme.backgroundImage"
-              :src="themeImageUrl(theme.backgroundImage)"
-              :alt="theme.name"
-              class="theme-card__image"
-            >
-            <div class="swatch-strip">
-              <span
-                v-for="(c, i) in swatchColors(theme.light, 'light')"
-                :key="`l-${i}`"
-                :style="{ backgroundColor: c }"
-              />
-            </div>
-            <div class="swatch-strip swatch-strip--dark">
-              <span
-                v-for="(c, i) in swatchColors(theme.dark, 'dark')"
-                :key="`d-${i}`"
-                :style="{ backgroundColor: c }"
-              />
-            </div>
-            <v-card-title class="d-flex align-center">
-              <span class="text-truncate">{{ theme.name }}</span>
-              <v-chip
-                v-if="theme.id === activeThemeId"
-                color="success"
-                size="small"
-                class="ml-2"
-              >
-                {{ $t('user-themes.active') }}
-              </v-chip>
-            </v-card-title>
-            <v-card-subtitle>
-              {{ [theme.fontHeading, theme.fontBody].filter(Boolean).filter((v, i, a) => a.indexOf(v) === i).join(' / ') || $t('user-themes.default-font') }}
-            </v-card-subtitle>
-            <v-card-actions>
+            <template #actions>
               <v-btn
                 variant="text"
                 :prepend-icon="$globals.icons.edit"
@@ -255,10 +200,93 @@
               >
                 {{ $t('user-themes.use-theme') }}
               </v-btn>
-            </v-card-actions>
-          </v-card>
+            </template>
+          </UserThemeCard>
         </v-col>
       </v-row>
+
+      <!-- Theme library -->
+      <template v-if="library.length">
+        <v-divider class="my-8" />
+        <div class="d-flex flex-wrap align-center ga-2 mb-1">
+          <h2 class="text-h5 mr-auto">
+            {{ $t('user-themes.theme-library') }}
+          </h2>
+          <BaseButton
+            v-if="isAdmin"
+            secondary
+            :icon="$globals.icons.cog"
+            to="/admin/themes"
+          >
+            {{ $t('user-themes.manage-library') }}
+          </BaseButton>
+        </div>
+        <p class="text-body-2 mb-3">
+          {{ $t('user-themes.theme-library-description') }}
+        </p>
+
+        <v-switch
+          :model-value="autoSeasonal"
+          color="primary"
+          hide-details
+          inset
+          :label="$t('user-themes.auto-seasonal')"
+          class="mb-1"
+          @update:model-value="toggleAutoSeasonal"
+        />
+        <p class="text-caption text-medium-emphasis mb-4">
+          {{ $t('user-themes.auto-seasonal-description') }}
+        </p>
+
+        <v-alert
+          v-if="seasonalTheme"
+          type="info"
+          variant="tonal"
+          density="compact"
+          class="mb-4"
+        >
+          {{ $t('user-themes.seasonal-active', { name: seasonalTheme.theme.name, date: formatDate(seasonalTheme.schedule?.end) }) }}
+        </v-alert>
+
+        <v-row>
+          <v-col
+            v-for="item in library"
+            :key="item.slug"
+            cols="12"
+            sm="6"
+          >
+            <UserThemeCard
+              :name="item.theme.name"
+              :subtitle="item.description"
+              :image="item.theme.backgroundImageUrl ?? null"
+              :light="item.theme.light"
+              :dark="item.theme.dark"
+              :schedule="item.schedule ?? null"
+              :active="item.theme.id === activeTheme?.id"
+              :selected="item.theme.id === activeThemeId"
+            >
+              <template #actions>
+                <v-btn
+                  variant="text"
+                  :prepend-icon="$globals.icons.edit"
+                  @click="customize(item)"
+                >
+                  {{ $t('user-themes.customize') }}
+                </v-btn>
+                <v-spacer />
+                <v-btn
+                  v-if="item.theme.id !== activeThemeId"
+                  color="primary"
+                  variant="text"
+                  @click="activate(item.theme.id)"
+                >
+                  {{ $t('user-themes.use-theme') }}
+                </v-btn>
+              </template>
+            </UserThemeCard>
+          </v-col>
+        </v-row>
+      </template>
     </section>
 
     <!-- Delete -->
@@ -303,18 +331,18 @@
 </template>
 
 <script setup lang="ts">
-import type { UserTheme, UserThemeColors } from "~/lib/api/types/user";
+import type { LibraryTheme, UserTheme, UserThemeColors } from "~/lib/api/types/user";
 import { THEME_PRESETS, type ThemePreset } from "~/lib/user-themes/presets";
 import {
   applyUserTheme,
   createDefaultTheme,
   getBaseColors,
   newThemeId,
+  resolveThemeImage,
   useUserThemes,
   type ThemeMode,
 } from "~/composables/use-user-themes";
 import { alert } from "~/composables/use-toast";
-import { themeImageUrl } from "~/lib/api/user/user-themes";
 
 definePageMeta({
   middleware: ["auth"],
@@ -323,9 +351,51 @@ definePageMeta({
 const i18n = useI18n();
 useSeoMeta({ title: i18n.t("user-themes.themes") });
 
-const { themes, activeThemeId, refresh, upsertTheme, deleteTheme, setActive, applyActive } = useUserThemes();
+const {
+  themes,
+  library,
+  activeThemeId,
+  activeTheme,
+  autoSeasonal,
+  seasonalTheme,
+  refresh,
+  upsertTheme,
+  deleteTheme,
+  setActive,
+  setAutoSeasonal,
+  applyActive,
+} = useUserThemes();
 
-const defaultColors = { light: getBaseColors("light"), dark: getBaseColors("dark") };
+const auth = useMealieAuth();
+const isAdmin = computed(() => !!auth.user.value?.admin);
+
+function fontSummary(theme: UserTheme) {
+  const fonts = [theme.fontHeading, theme.fontBody].filter((v, i, a): v is string => !!v && a.indexOf(v) === i);
+  return fonts.join(" / ") || i18n.t("user-themes.default-font");
+}
+
+function formatDate(monthDay: string | undefined) {
+  if (!monthDay) {
+    return "";
+  }
+  const [month, day] = monthDay.split("-").map(Number);
+  return new Date(2000, (month ?? 1) - 1, day ?? 1).toLocaleDateString(i18n.locale.value, { month: "long", day: "numeric" });
+}
+
+async function toggleAutoSeasonal(value: boolean | null) {
+  const { data } = await setAutoSeasonal(!!value);
+  if (!data) {
+    alert.error(i18n.t("user-themes.theme-save-failed"));
+  }
+}
+
+/** Copies a library theme into the user's own themes so it can be changed */
+function customize(item: LibraryTheme) {
+  const copy = clone(item.theme);
+  copy.id = newThemeId();
+  openEditor(copy);
+  original.value = "";
+}
 
 onMounted(async () => {
   await refresh();
@@ -547,29 +617,6 @@ function importTheme() {
 </script>
 
 <style scoped>
-.theme-card {
-  border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
-  overflow: hidden;
-}
-.theme-card--active {
-  border: 2px solid rgb(var(--v-theme-success));
-}
-.theme-card__image {
-  display: block;
-  width: 100%;
-  height: 110px;
-  object-fit: cover;
-}
-.swatch-strip {
-  display: flex;
-  height: 22px;
-}
-.swatch-strip span {
-  flex: 1;
-}
-.swatch-strip--dark {
-  height: 14px;
-}
 .mini-swatch {
   width: 12px;
   height: 20px;

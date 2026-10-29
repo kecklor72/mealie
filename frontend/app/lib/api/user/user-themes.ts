@@ -1,5 +1,5 @@
 import { BaseAPI } from "../base/base-clients";
-import type { UserThemeImage, UserThemeSettings } from "~/lib/api/types/user";
+import type { LibraryTheme, UserThemeImage, UserThemeSettings } from "~/lib/api/types/user";
 
 const prefix = "/api";
 
@@ -7,6 +7,7 @@ const routes = {
   themesSelf: `${prefix}/users/self/themes`,
   themesSelfImages: `${prefix}/users/self/themes/images`,
   themesSelfImagesId: (id: string) => `${prefix}/users/self/themes/images/${id}`,
+  library: `${prefix}/themes/library`,
 };
 
 /** URL of an uploaded theme image. Requests are authenticated with the session cookie. */
@@ -31,6 +32,10 @@ export class UserThemesAPI extends BaseAPI {
     const form = new FormData();
     form.append("image", file);
     return await this.requests.post<UserThemeImage>(routes.themesSelfImages, form);
+  }
+
+  async getLibrary() {
+    return await this.requests.get<LibraryTheme[]>(routes.library);
   }
 
   async deleteImage(imageId: string) {

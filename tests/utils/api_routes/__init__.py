@@ -27,6 +27,8 @@ admin_maintenance_clean_temp = "/api/admin/maintenance/clean/temp"
 """`/api/admin/maintenance/clean/temp`"""
 admin_maintenance_storage = "/api/admin/maintenance/storage"
 """`/api/admin/maintenance/storage`"""
+admin_themes_library = "/api/admin/themes/library"
+"""`/api/admin/themes/library`"""
 admin_users = "/api/admin/users"
 """`/api/admin/users`"""
 admin_users_password_reset_token = "/api/admin/users/password-reset-token"
@@ -199,6 +201,8 @@ recipes_timeline_events = "/api/recipes/timeline/events"
 """`/api/recipes/timeline/events`"""
 shared_recipes = "/api/shared/recipes"
 """`/api/shared/recipes`"""
+themes_library = "/api/themes/library"
+"""`/api/themes/library`"""
 units = "/api/units"
 """`/api/units`"""
 units_merge = "/api/units/merge"
@@ -260,6 +264,16 @@ def admin_groups_item_id(item_id):
 def admin_households_item_id(item_id):
     """`/api/admin/households/{item_id}`"""
     return f"{prefix}/admin/households/{item_id}"
+
+
+def admin_themes_library_slug(slug):
+    """`/api/admin/themes/library/{slug}`"""
+    return f"{prefix}/admin/themes/library/{slug}"
+
+
+def admin_themes_library_slug_export(slug):
+    """`/api/admin/themes/library/{slug}/export`"""
+    return f"{prefix}/admin/themes/library/{slug}/export"
 
 
 def admin_users_item_id(item_id):
@@ -585,6 +599,11 @@ def recipes_timeline_events_item_id_image(item_id):
 def shared_recipes_item_id(item_id):
     """`/api/shared/recipes/{item_id}`"""
     return f"{prefix}/shared/recipes/{item_id}"
+
+
+def themes_library_slug_files_name(slug, name):
+    """`/api/themes/library/{slug}/files/{name}`"""
+    return f"{prefix}/themes/library/{slug}/files/{name}"
 
 
 def units_item_id(item_id):

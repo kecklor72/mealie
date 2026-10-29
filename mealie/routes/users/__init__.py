@@ -9,6 +9,7 @@ router = APIRouter()
 
 router.include_router(registration.router, prefix=user_prefix, tags=["Users: Registration"])
 router.include_router(themes.router)
+router.include_router(themes.library_router)
 router.include_router(crud.user_router)
 router.include_router(forgot_password.router, prefix=user_prefix, tags=["Users: Passwords"])
 router.include_router(images.router, prefix=user_prefix, tags=["Users: Images"])

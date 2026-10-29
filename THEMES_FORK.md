@@ -11,6 +11,57 @@ This fork adds a per-user **Theme Manager** to Mealie, at **Profile → Themes**
 - 6 presets to start from, plus duplicate / import / export (copy theme JSON)
 - Each user has their own themes, and "Mealie Default" uses the server's `THEME_*` settings
 
+## Theme library (built-in holiday themes + admin theme packs)
+
+- **Built-in themes** ship inside the image in `mealie/assets/themes/`: Halloween, Haunted Halloween (with the haunted-house background), Thanksgiving, Christmas and 4th of July.
+- Every user sees them under **Profile → Themes → Theme Library**. They can **Use Theme** or **Customize** (makes an editable copy in *My Themes*, keeping the images).
+- **Use holiday themes automatically** (on by default, per user): a library theme with a schedule is used on its dates every year, then the user's own pick comes back.
+  - Haunted Halloween: Oct 1 – Oct 31
+  - Thanksgiving: Nov 1 – Nov 30
+  - Christmas: Dec 1 – Dec 26
+  - 4th of July: Jun 28 – Jul 5
+- **Admins** manage the library at **Admin → Theme Library** (`/admin/themes`): upload theme packs (zip), enable/disable themes, change the dates, download any theme as a pack, delete uploaded themes. Built-in themes can only be disabled.
+- Uploaded packs are stored in `/app/data/user-themes/library/`; admin settings in `/app/data/user-themes/library.json`.
+
+### Theme pack format
+
+```
+my-theme.zip
+├── theme.json        (required)
+├── style.css         (optional)
+├── background.jpg    (optional)
+└── images/…          (optional, can be used from the CSS)
+```
+
+`theme.json` — only `name` is required:
+
+```json
+{
+  "id": "spring",
+  "name": "Spring",
+  "description": "Fresh greens and pastels",
+  "light": { "primary": "#4CAF50", "secondary": "#F48FB1", "accent": "#81D4FA" },
+  "dark": { "primary": "#81C784", "background": "#102016", "surface": "#18301F" },
+  "fontHeading": "Quicksand",
+  "fontBody": "Nunito",
+  "customCss": "",
+  "css": "style.css",
+  "backgroundImage": "background.jpg",
+  "sidebarImage": "sidebar.jpg",
+  "backgroundDim": 0.2,
+  "panelOpacity": 0.6,
+  "cardOpacity": 0.85,
+  "schedule": { "start": "03-20", "end": "04-30" }
+}
+```
+
+- Images (JPG, PNG, WebP, GIF, AVIF, HEIC) are converted to WebP and scaled down to 3840 px.
+- CSS can use the pack's images with relative paths, e.g. `url("images/flower.png")`.
+- `schedule` dates are `MM-DD` and may wrap around New Year (e.g. `12-20` to `01-05`).
+- A zip can contain several themes, each in its own folder with its own `theme.json`.
+- Uploading a theme with the same `id` again replaces it. Ids that clash with a built-in theme get a `-2` suffix.
+- Limits: 60 MB zip, 30 MB per file, 300 files, 20 themes per zip, 100 KB of CSS per theme.
+
 ## How it's built (and why it's easy to keep updated)
 
 - **No database changes.** Themes are saved as JSON files in the data volume at `/app/data/user-themes/<user-id>.json`. They are included in Mealie backups. You can switch back to the official image at any time without breaking anything, and the themes stay put if you come back.

@@ -1,0 +1,37 @@
+{
+  "id": "halloween",
+  "name": "Halloween",
+  "description": "Pumpkin orange and spooky purple, with drifting bats and ghosts.",
+  "light": {
+    "primary": "#E8590C",
+    "accent": "#2B8A3E",
+    "secondary": "#5F3DC4",
+    "success": "#37B24D",
+    "info": "#7048E8",
+    "warning": "#F59F00",
+    "error": "#C92A2A",
+    "background": "#FFF7ED",
+    "surface": "#FFFFFF"
+  },
+  "dark": {
+    "primary": "#FF7A1A",
+    "accent": "#69DB7C",
+    "secondary": "#9775FA",
+    "success": "#51CF66",
+    "info": "#9775FA",
+    "warning": "#FFD43B",
+    "error": "#FF6B6B",
+    "background": "#0F0B14",
+    "surface": "#1A1422"
+  },
+  "fontBody": "Nunito",
+  "fontHeading": "Creepster",
+  "customCss": ".v-app-bar .v-toolbar-title__placeholder::after { content: \" 🎃\"; }\n.v-app-bar { border-bottom: 3px solid rgb(var(--v-theme-secondary)); }\n\n/* 🦇 Gently falling emoji. Change the emoji in the two \"content\" lines (🦇 👻 for Halloween, ⭐ 🎆 for the 4th) */\n.v-application::before,\n.v-application::after {\n  position: fixed;\n  top: -10vh;\n  left: 0;\n  width: 100vw;\n  pointer-events: none;\n  z-index: 3000;\n  white-space: pre;\n  font-size: 22px;\n  opacity: 0.7;\n  animation: mealie-fall 18s linear infinite;\n}\n.v-application::before {\n  content: \"🦇            👻                     🦇          👻                🦇                 👻         🦇\";\n}\n.v-application::after {\n  content: \"      👻                 🦇          👻                    🦇            👻        🦇             👻\";\n  font-size: 18px;\n  animation-duration: 24s;\n  animation-delay: -9s;\n}\n@keyframes mealie-fall {\n  0%   { transform: translate(0, 0) rotate(0deg); }\n  50%  { transform: translate(30px, 60vh) rotate(8deg); }\n  100% { transform: translate(-20px, 125vh) rotate(-6deg); }\n}\n@media (prefers-reduced-motion: reduce) {\n  .v-application::before, .v-application::after { animation: none; display: none; }\n}",
+  "css": null,
+  "backgroundImage": null,
+  "sidebarImage": null,
+  "backgroundDim": 0.3,
+  "panelOpacity": 0.75,
+  "cardOpacity": 0.9,
+  "schedule": null
+}

@@ -11,7 +11,7 @@ export default defineNuxtPlugin({
   setup(nuxtApp) {
     // Composables must be created synchronously in the plugin context (not inside hooks)
     const auth = useMealieAuth();
-    const { refresh, settings } = useUserThemes(nuxtApp.$i18n as Composer);
+    const { refresh, settings, library } = useUserThemes(nuxtApp.$i18n as Composer);
     let started = false;
 
     const start = (theme: ThemeInstance) => {
@@ -26,6 +26,7 @@ export default defineNuxtPlugin({
         async (userId) => {
           if (!userId) {
             settings.value = null;
+            library.value = [];
             applyUserTheme(null);
             return;
           }
