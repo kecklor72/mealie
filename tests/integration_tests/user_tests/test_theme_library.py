@@ -11,7 +11,24 @@ from mealie.core.config import get_app_dirs
 from tests.utils import api_routes
 from tests.utils.fixture_schemas import TestUser
 
-BUILTIN_SLUGS = {"halloween", "haunted-halloween", "thanksgiving", "christmas", "fourth-of-july"}
+BUILTIN_SLUGS = {
+    "haunted-halloween",
+    "harvest-thanksgiving",
+    "north-pole-christmas",
+    "stars-and-stripes",
+    "memorial-day",
+    "happy-new-year",
+    "labor-day-cookout",
+    "kitchen-inferno",
+    "psychedelic-kitchen",
+    "summer-tiki-bar",
+    "garden-kitchen",
+    "autumn-harvest",
+    "winter-lodge",
+    "oktoberfest",
+    "mardi-gras",
+    "steampunk-kitchen",
+}
 
 LIBRARY = "/api/themes/library"
 ADMIN_LIBRARY = "/api/admin/themes/library"
@@ -72,7 +89,7 @@ def test_only_admins_can_manage_library(api_client: TestClient, unique_user: Tes
     pack = _zip({"theme.json": {"name": "Nope"}})
     assert _upload(api_client, unique_user, pack).status_code == 403
     assert api_client.get(ADMIN_LIBRARY, headers=unique_user.token).status_code == 403
-    assert api_client.delete(f"{ADMIN_LIBRARY}/halloween", headers=unique_user.token).status_code == 403
+    assert api_client.delete(f"{ADMIN_LIBRARY}/haunted-halloween", headers=unique_user.token).status_code == 403
 
 
 def test_upload_theme_pack(api_client: TestClient, unique_admin: TestUser, unique_user: TestUser):
@@ -131,14 +148,14 @@ def test_upload_theme_pack(api_client: TestClient, unique_admin: TestUser, uniqu
 def test_upload_multiple_themes_and_builtin_collision(api_client: TestClient, unique_admin: TestUser):
     pack = _zip(
         {
-            "a/theme.json": {"name": "Halloween"},  # same slug as a built-in theme
+            "a/theme.json": {"name": "Haunted Halloween"},  # same slug as a built-in theme
             "b/theme.json": {"name": "Second Theme"},
         }
     )
     response = _upload(api_client, unique_admin, pack)
     assert response.status_code == 201, response.text
     slugs = {t["slug"] for t in response.json()["imported"]}
-    assert slugs == {"halloween-2", "second-theme"}
+    assert slugs == {"haunted-halloween-2", "second-theme"}
 
 
 @pytest.mark.parametrize(
@@ -180,15 +197,15 @@ def test_failed_upload_changes_nothing(api_client: TestClient, unique_admin: Tes
 
 
 def test_disable_and_reschedule(api_client: TestClient, unique_admin: TestUser, unique_user: TestUser):
-    url = f"{ADMIN_LIBRARY}/christmas"
+    url = f"{ADMIN_LIBRARY}/north-pole-christmas"
     response = api_client.patch(url, json={"enabled": False}, headers=unique_admin.token)
     assert response.status_code == 200
     assert response.json()["enabled"] is False
 
     user_slugs = [t["slug"] for t in api_client.get(LIBRARY, headers=unique_user.token).json()]
-    assert "christmas" not in user_slugs
+    assert "north-pole-christmas" not in user_slugs
     admin_slugs = [t["slug"] for t in api_client.get(ADMIN_LIBRARY, headers=unique_admin.token).json()]
-    assert "christmas" in admin_slugs
+    assert "north-pole-christmas" in admin_slugs
 
     response = api_client.patch(
         url, json={"enabled": True, "schedule": {"start": "11-25", "end": "12-31"}}, headers=unique_admin.token
@@ -204,7 +221,7 @@ def test_disable_and_reschedule(api_client: TestClient, unique_admin: TestUser, 
 
 
 def test_delete(api_client: TestClient, unique_admin: TestUser, unique_user: TestUser):
-    assert api_client.delete(f"{ADMIN_LIBRARY}/halloween", headers=unique_admin.token).status_code == 400
+    assert api_client.delete(f"{ADMIN_LIBRARY}/haunted-halloween", headers=unique_admin.token).status_code == 400
 
     pack = _zip({"theme.json": {"id": "to-delete", "name": "To Delete", "backgroundImage": "bg.png"}, "bg.png": _png()})
     image_url = _upload(api_client, unique_admin, pack).json()["imported"][0]["theme"]["backgroundImageUrl"]
